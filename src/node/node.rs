@@ -2,6 +2,8 @@ use std::net::SocketAddr;
 use tokio::sync::{mpsc, Mutex};
 use std::collections::HashSet;
 //use std::sync::Arc;
+use rsa::{RsaPrivateKey, RsaPublicKey};
+
 
 
 pub struct Node {
@@ -11,6 +13,8 @@ pub struct Node {
     peers: Mutex<HashSet<SocketAddr>>,
     sender: mpsc::Sender<String>,
     receiver: mpsc::Receiver<String>,
+    private_key: RsaPrivateKey,
+    public_key: RsaPublicKey,    
 }
 
 impl Node {
@@ -19,12 +23,20 @@ impl Node {
         // Init Constructor here
         let (sender, mut receiver) = mpsc::channel(1);
 
+        let mut rng = rand::thread_rng();
+        let bits = 2048;
+        let private_key = RsaPrivateKey::new(&mut rng, bits).expect("failed to generate a key");
+        let public_key = RsaPublicKey::from(&private_key);
+
+
         let mut node = Node {
             id: id,
             address: address,
             peers: Mutex::new(HashSet::new()),
             sender: sender,
             receiver: receiver,
+            private_key: private_key,
+            public_key: public_key,
         };
         node
     }
@@ -36,6 +48,22 @@ impl Node {
 
     pub fn get_addr(&self) -> SocketAddr {
         return (self.address).clone();
+    }
+
+
+    pub fn get_public_key(&self) -> RsaPublicKey {
+        return (self.public_key).clone();
+    }
+
+
+    pub async fn add_peer(&self, peer_addr: SocketAddr) {
+        let mut peers = self.peers.lock().await;
+        peers.insert(peer_addr);
+    }
+
+    pub async fn remove_peer(&self, peer_addr: SocketAddr) {
+        let mut peers = self.peers.lock().await;
+        peers.remove(&peer_addr);
     }
 
 
@@ -61,16 +89,6 @@ impl Node {
         
     }
     */
-
-    fn async add_peer(&self, peer_addr: SocketAddr) {
-        let mut peers = self.peers.lock().await;
-        peers.insert(peer_addr);
-    }
-
-    fn remove_peer(&self, peer_addr: SocketAddr) {
-        let mut peers = self.peers.lock().await;
-        peers.remove(&addr);
-    }
 
     /*
     pub async fn discover_peers(&self) {
