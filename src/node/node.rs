@@ -5,7 +5,6 @@ use std::collections::HashSet;
 use rsa::{RsaPrivateKey, RsaPublicKey};
 
 
-
 pub struct Node {
     
     id: String,
@@ -27,7 +26,6 @@ impl Node {
         let bits = 2048;
         let private_key = RsaPrivateKey::new(&mut rng, bits).expect("failed to generate a key");
         let public_key = RsaPublicKey::from(&private_key);
-
 
         let mut node = Node {
             id: id,
@@ -67,17 +65,21 @@ impl Node {
     }
 
 
-    /*
+      
     pub async fn connect_to_peer(&self, peer_addr: SocketAddr) {
         
     }
 
-    pub aysnc fn disconnect_from_peer(&self, peer_addr: SocketAddr) {
-
+    pub async fn disconnect_from_peer(&self, peer_addr: SocketAddr) {
+    
     }
 
-    pub async fn send_message() {
 
+    /*
+    
+    pub async fn send_message(&self, message: String, peer_addr_: SocketAddr) {
+        // takes in an encrypted and serialized message and sends it to the correct recepient
+        
     }
 
     pub async fn listen_for_messages(&self) {
@@ -88,9 +90,9 @@ impl Node {
     fn handle_message(&self, message: String) {
         
     }
-    */
+    
 
-    /*
+    
     pub async fn discover_peers(&self) {
         
     }
